@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#030712] text-slate-200 font-sans antialiased min-h-screen selection:bg-cyan-500/30 selection:text-cyan-50;
+    /* Deep multi-layered background */
+    background-color: #030712;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* Premium SOC Card */
+  .soc-card {
+    @apply bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl transition-all duration-300 relative overflow-hidden;
+  }
+  .soc-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity duration-300 pointer-events-none;
+  }
+  .soc-card:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Inputs */
+  .soc-input {
+    @apply w-full bg-slate-950/80 border border-slate-700/80 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl hover:from-cyan-500 hover:to-blue-500 border border-cyan-400/30 transition-all duration-300 tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] flex items-center justify-center space-x-2 active:scale-95;
+  }
+  .btn-danger {
+    @apply px-6 py-3 bg-gradient-to-r from-rose-600 to-red-600 text-white font-bold rounded-xl hover:from-rose-500 hover:to-red-500 border border-rose-400/30 transition-all duration-300 tracking-wider shadow-[0_0_20px_rgba(225,29,72,0.2)] hover:shadow-[0_0_30px_rgba(225,29,72,0.4)] flex items-center justify-center space-x-2 active:scale-95;
+  }
+  .btn-secondary {
+    @apply px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-xl hover:from-violet-500 hover:to-indigo-500 border border-violet-400/30 transition-all duration-300 tracking-wider shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] flex items-center justify-center space-x-2 active:scale-95;
+  }
+  .btn-outline {
+    @apply px-6 py-3 bg-slate-900/50 text-slate-200 border border-slate-600 font-bold rounded-xl hover:border-cyan-500/80 hover:text-cyan-400 hover:bg-cyan-900/20 transition-all duration-300 tracking-wider flex items-center justify-center space-x-2 active:scale-95;
+  }
+  
+  /* Panels */
+  .terminal-panel {
+    @apply bg-[#020617] border border-slate-800 rounded-xl p-5 font-mono text-sm shadow-inner text-cyan-400 relative overflow-hidden;
+  }
+}
+
+/* Animations */
+.neo-glow-cyan {
+  filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.5));
+}
+.neo-glow-violet {
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+}
+.neo-glow-red {
+  filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.5));
+}
+
+@keyframes scan-vertical {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(6, 182, 212, 1), transparent);
+  animation: scan-vertical 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.8);
+  z-index: 10;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes scale-x {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.presentation-mode {
+  /* Increase contrast rules for projector */
+  --text-slate-400: #94a3b8;
+  --text-slate-500: #cbd5e1; /* Making mid-grays lighter for dark background */
+}
+
+.presentation-mode .text-slate-500,
+.presentation-mode .text-slate-400 {
+  @apply text-slate-300 font-semibold;
+}
+
+.presentation-mode p {
+  @apply text-slate-200 font-medium text-base;
+}
+
+.presentation-mode h1, 
+.presentation-mode h2, 
+.presentation-mode h3 {
+  @apply text-white font-black tracking-wide;
+}
+
+/* =========================================================================
+   DYNAMIC SETTINGS (THEME, COMPACT, ANIMATIONS)
+   ========================================================================= */
+
+/* Default Background container */
+.app-container {
+  background-color: #030712;
+}
+.main-content-wrapper {
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+}
+
+/* Light Theme Variables & Overrides */
+.light-theme .app-container {
+  background-color: #f8fafc;
+}
+
+.light-theme .soc-card, 
+.light-theme .bg-slate-900\/50, 
+.light-theme .bg-slate-900, 
+.light-theme .bg-slate-900\/80,
+.light-theme header,
+.light-theme aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme .text-slate-200, 
+.light-theme .text-white, 
+.light-theme .text-slate-300, 
+.light-theme .text-slate-400 {
+  color: #0f172a !important;
+}
+
+.light-theme .text-slate-500 {
+  color: #475569 !important;
+}
+
+.light-theme .bg-slate-800, 
+.light-theme .bg-slate-800\/50 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Compact Layout */
+.compact-layout .main-content-wrapper {
+  padding: 1rem !important;
+}
+
+.compact-layout .soc-card {
+  padding: 1rem !important;
+  gap: 0.5rem !important;
+}
+
+.compact-layout .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem !important;
+}
+
+.compact-layout .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.75rem !important;
+}
+
+/* Reduce Animations */
+.reduce-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
