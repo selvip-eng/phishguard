@@ -13,6 +13,7 @@ import Awareness from './pages/Awareness';
 import About from './pages/About';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import EducationalPhishingPage from './pages/EducationalPhishingPage';
 
 export type ThemeType = 'dark' | 'light' | 'system';
 
@@ -118,6 +119,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/simulator" element={<AttackSimulator />} />
+                    <Route path="/attack-simulator/phishing-page" element={<EducationalPhishingPage />} />
                     <Route path="/detector" element={<PhishingDetector />} />
                     <Route path="/url-analyzer" element={<URLAnalyzer />} />
                     <Route path="/scenarios" element={<TrainingScenarios />} />

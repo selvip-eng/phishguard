@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Shield, ChevronRight, Lock, Mail, Globe, Server, UserCheck, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 const AttackSimulator = () => {
   const [step, setStep] = useState(1);
   const [, setSelectedScenario] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const scenarios = [
     {
@@ -126,7 +128,12 @@ const AttackSimulator = () => {
                   <p>We detected an unauthorized login attempt to your account from a new IP address in <strong>Russia</strong> on {new Date().toLocaleDateString()}.</p>
                   <p>To prevent immediate suspension of your account, you must verify your identity within the next 2 hours.</p>
                   <div className="py-4 text-center">
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Verify Account Now</button>
+                    <button 
+                      onClick={() => navigate('/attack-simulator/phishing-page')}
+                      className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700"
+                    >
+                      Verify Account Now
+                    </button>
                   </div>
                   <p>If you fail to verify, your access will be permanently locked.</p>
                   <p className="text-slate-500 mt-8 text-xs">Security Operations Center</p>
@@ -234,7 +241,7 @@ const AttackSimulator = () => {
                 <button onClick={() => setStep(1)} className="btn-outline text-sm">
                   Run Another Scenario
                 </button>
-                <button className="btn-primary text-sm" onClick={() => window.location.href = '/detector'}>
+                <button className="btn-primary text-sm" onClick={() => navigate('/detector')}>
                   Go to Detector
                 </button>
               </div>

@@ -52,6 +52,32 @@ const PhishingDetector = () => {
     reader.readAsText(file);
   };
 
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    
+    // Auto-parse if they pasted full headers
+    let newSender = inputData.sender;
+    let newSubject = inputData.subject;
+    let newReplyTo = inputData.replyTo;
+    
+    // Simple regex for extracting basic headers from raw paste
+    const fromMatch = text.match(/^From:\s*(.+)$/im);
+    const subjectMatch = text.match(/^Subject:\s*(.+)$/im);
+    const replyToMatch = text.match(/^Reply-To:\s*(.+)$/im);
+    
+    if (fromMatch && !inputData.sender) newSender = fromMatch[1].trim();
+    if (subjectMatch && !inputData.subject) newSubject = subjectMatch[1].trim();
+    if (replyToMatch && !inputData.replyTo) newReplyTo = replyToMatch[1].trim();
+
+    setInputData({
+      ...inputData,
+      body: text,
+      sender: newSender,
+      subject: newSubject,
+      replyTo: newReplyTo
+    });
+  };
+
   const handleAnalyze = async () => {
     setError('');
     setDownloadSuccess(false);
@@ -102,21 +128,21 @@ const PhishingDetector = () => {
           <Activity className="w-8 h-8 text-cyan-400 mr-3" />
           SOC ANALYSIS WORKSPACE
         </h1>
-        <p className="text-slate-500 font-mono tracking-wide">"Analyze an email, message, or suspicious content for phishing indicators."</p>
+        <p className="text-slate-400 font-mono tracking-wide">"Analyze an email, message, or suspicious content for phishing indicators."</p>
       </div>
 
-      <div className="soc-card overflow-hidden border-t-2 border-t-primary/50">
-        <div className="flex border-b border-slate-700/50 bg-[#080d1a]">
+      <div className="soc-card overflow-hidden border-t-2 border-t-cyan-500/50">
+        <div className="flex border-b border-slate-700/50 bg-slate-950/80">
           <button 
             onClick={() => setActiveTab('paste')}
-            className={`flex-1 py-4 text-center font-bold transition-colors flex items-center justify-center space-x-2 ${activeTab === 'paste' ? 'bg-cyan-500/100/10 text-cyan-400 border-b-2 border-primary' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/80/5'}`}
+            className={`flex-1 py-4 text-center font-bold transition-colors flex items-center justify-center space-x-2 ${activeTab === 'paste' ? 'bg-cyan-500/10 text-cyan-400 border-b-2 border-cyan-500' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/50'}`}
           >
             <FileText className="w-5 h-5" />
             <span>PASTE EMAIL</span>
           </button>
           <button 
             onClick={() => setActiveTab('upload')}
-            className={`flex-1 py-4 text-center font-bold transition-colors flex items-center justify-center space-x-2 ${activeTab === 'upload' ? 'bg-cyan-500/100/10 text-cyan-400 border-b-2 border-primary' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/80/5'}`}
+            className={`flex-1 py-4 text-center font-bold transition-colors flex items-center justify-center space-x-2 ${activeTab === 'upload' ? 'bg-cyan-500/10 text-cyan-400 border-b-2 border-cyan-500' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/50'}`}
           >
             <Upload className="w-5 h-5" />
             <span>UPLOAD .EML</span>
@@ -127,7 +153,7 @@ const PhishingDetector = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Input Form */}
             <div className="space-y-5 relative flex flex-col h-full">
-              <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/50 to-transparent hidden lg:block"></div>
+              <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-500/50 to-transparent hidden lg:block"></div>
               
               <div className="flex items-center justify-between border-b border-slate-700/50 pb-2">
                 <h3 className="text-lg font-bold text-white flex items-center">
@@ -151,56 +177,61 @@ const PhishingDetector = () => {
                 {activeTab === 'paste' ? (
                   <div className="space-y-4 animate-in fade-in">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sender (From)</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sender (From)</label>
                       <input 
                         type="text" 
-                        className="input-field font-mono text-sm" 
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/50 font-mono text-sm" 
                         value={inputData.sender} 
                         onChange={e => setInputData({...inputData, sender: e.target.value})}
                         placeholder="e.g. security@paypal.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Reply-To (Optional)</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Reply-To (Optional)</label>
                       <input 
                         type="text" 
-                        className="input-field font-mono text-sm" 
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/50 font-mono text-sm" 
                         value={inputData.replyTo || ''} 
                         onChange={e => setInputData({...inputData, replyTo: e.target.value})}
                         placeholder="e.g. scammer@gmail.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subject</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Subject</label>
                       <input 
                         type="text" 
-                        className="input-field text-sm" 
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/50 text-sm" 
                         value={inputData.subject}
                         onChange={e => setInputData({...inputData, subject: e.target.value})}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Body (Including URLs)</label>
+                      <div className="flex justify-between items-end mb-2">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Email Body (Including URLs)</label>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-3 border-l-2 border-cyan-500/50 pl-2">
+                        You can paste the entire email including From, To, Subject, message body and URLs. PHISHGUARD will extract the available indicators automatically.
+                      </p>
                       <textarea 
-                        className="input-field h-40 resize-none text-sm leading-relaxed font-mono"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-cyan-500/50 h-56 resize-none text-sm leading-relaxed font-mono custom-scrollbar"
                         value={inputData.body}
-                        onChange={e => setInputData({...inputData, body: e.target.value})}
-                        placeholder="Paste the suspicious email text here..."
+                        onChange={handleBodyChange}
+                        placeholder="Paste the complete suspicious email here..."
                       />
                     </div>
                   </div>
                 ) : (
-                  <div className="animate-in fade-in flex flex-col items-center justify-center h-full min-h-[300px] border-2 border-dashed border-slate-600/50 rounded-xl bg-slate-800/50 hover:bg-slate-800/50 transition-colors">
+                  <div className="animate-in fade-in flex flex-col items-center justify-center h-full min-h-[300px] border-2 border-dashed border-slate-600/50 rounded-xl bg-slate-800/20 hover:bg-slate-800/50 transition-colors">
                     {!fileName ? (
                       <div className="text-center space-y-4 p-8">
-                        <Upload className="w-12 h-12 text-slate-400 mx-auto" />
+                        <Upload className="w-12 h-12 text-slate-500 mx-auto" />
                         <div>
-                          <p className="text-slate-400 font-medium">Drag and drop an .eml file here</p>
-                          <p className="text-slate-400 text-sm mt-1">or click to browse from your computer</p>
+                          <p className="text-slate-300 font-medium">Drag and drop an .eml file here</p>
+                          <p className="text-slate-500 text-sm mt-1">or click to browse from your computer</p>
                         </div>
                         <button 
                           onClick={() => fileInputRef.current?.click()}
-                          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded border border-slate-600/50 text-sm font-medium transition-colors"
+                          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600/50 text-sm font-medium transition-colors text-slate-200"
                         >
                           Select File
                         </button>
@@ -214,7 +245,7 @@ const PhishingDetector = () => {
                         </div>
                         <button 
                           onClick={() => fileInputRef.current?.click()}
-                          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded border border-slate-600/50 text-sm font-medium transition-colors"
+                          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600/50 text-sm font-medium transition-colors text-slate-200"
                         >
                           Change File
                         </button>
@@ -222,129 +253,120 @@ const PhishingDetector = () => {
                     )}
                     <input 
                       type="file" 
-                      accept=".eml,.txt" 
-                      className="hidden" 
                       ref={fileInputRef}
                       onChange={handleFileUpload}
+                      accept=".eml,.txt"
+                      className="hidden" 
                     />
                   </div>
                 )}
               </div>
-              
-              <div className="pt-6">
-                <button 
-                  onClick={handleAnalyze} 
-                  disabled={analyzing}
-                  className="btn-primary w-full py-4 text-lg"
-                >
-                  {analyzing ? (
-                    <div className="flex items-center space-x-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div>
-                      <span>ANALYZING THREAT LOGIC...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <Search className="w-5 h-5" />
-                      <span>INITIALIZE DETECTION</span>
-                    </div>
-                  )}
-                </button>
-              </div>
+
+              <button 
+                onClick={handleAnalyze}
+                disabled={analyzing}
+                className="w-full bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] disabled:shadow-none flex items-center justify-center space-x-2 group mt-4"
+              >
+                {analyzing ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-slate-400 border-t-white rounded-full animate-spin"></div>
+                    <span>ANALYZING THREATS...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span>INITIALIZE DETECTION</span>
+                  </>
+                )}
+              </button>
             </div>
 
-            {/* Results Area */}
-            <div className="bg-slate-900/80 rounded-xl border border-slate-700/50 p-6 relative overflow-hidden flex flex-col min-h-[600px]">
-              
-              {!analyzing && !result && (
-                <div className="text-center text-slate-400 space-y-4 m-auto">
-                  <Activity className="w-16 h-16 mx-auto opacity-20" />
-                  <p className="font-mono text-sm uppercase tracking-widest">Engine Standby</p>
-                  <p className="text-xs">Awaiting telemetry input for heuristic analysis.</p>
+            {/* Analysis Results Panel */}
+            <div className="bg-slate-950/80 rounded-xl border border-slate-700/50 relative overflow-hidden flex flex-col h-full min-h-[500px]">
+              <div className="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between z-10">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${result ? 'bg-rose-500 animate-pulse' : 'bg-slate-600'}`}></div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Analysis Engine</span>
                 </div>
-              )}
+                {analyzing && (
+                  <span className="text-xs text-cyan-400 font-mono animate-pulse">PROCESSING TELEMETRY...</span>
+                )}
+              </div>
 
-              {analyzing && (
-                <div className="flex flex-col items-center justify-center space-y-8 z-10 m-auto w-full">
-                  <div className="relative w-full max-w-sm h-1 bg-gray-900 rounded overflow-hidden">
-                    <div className="scan-line bg-primary shadow-[0_0_15px_rgba(6,182,212,1)]" style={{ animation: 'scan 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite', height: '100%', width: '50%', left: '-50%' }}></div>
-                    <style>{`@keyframes scan { 0% { left: -50%; } 100% { left: 100%; } }`}</style>
+              {!result && !analyzing ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-slate-500 space-y-4 p-8">
+                  <Activity className="w-16 h-16 opacity-20" />
+                  <p className="text-sm uppercase tracking-widest font-bold">Engine Standby</p>
+                  <p className="text-xs text-center max-w-xs opacity-60">Awaiting telemetry input for heuristic analysis.</p>
+                </div>
+              ) : analyzing ? (
+                <div className="flex-1 p-8 text-cyan-500 font-mono text-sm overflow-hidden flex flex-col justify-end">
+                  <div className="space-y-2 opacity-70">
+                    <p>&gt; Initializing security sandbox...</p>
+                    <p>&gt; Parsing email headers...</p>
+                    <p>&gt; Extracting indicator strings...</p>
+                    <p>&gt; Analyzing linguistic patterns...</p>
+                    <p>&gt; Checking domain reputation...</p>
+                    <p className="animate-pulse">&gt; Evaluating risk score...</p>
                   </div>
+                </div>
+              ) : result && (
+                <div className="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar animate-in fade-in z-10">
                   
-                  <div className="terminal-panel w-full max-w-sm border-cyan-500/40 text-cyan-400 bg-primary/5 text-xs">
-                    <p className="animate-pulse">&gt; Parsing MIME structure...</p>
-                    <p className="animate-pulse" style={{ animationDelay: '0.3s' }}>&gt; Extracting authentication headers...</p>
-                    <p className="animate-pulse" style={{ animationDelay: '0.6s' }}>&gt; Scanning lexical parameters...</p>
-                    <p className="animate-pulse" style={{ animationDelay: '0.9s' }}>&gt; Checking URL reputation...</p>
-                    <p className="animate-pulse" style={{ animationDelay: '1.2s' }}>&gt; Calculating threat probability...</p>
-                  </div>
-                </div>
-              )}
-
-              {result && !analyzing && (
-                <div className="space-y-6 animate-in slide-in-from-right-8 duration-500 absolute inset-0 p-6 overflow-y-auto">
-                  <div className="flex flex-col gap-4">
-                    {/* Score Card */}
-                    <div className={`p-6 rounded-xl border flex flex-col items-center justify-center text-center relative overflow-hidden shadow-lg ${
-                      result.level === 'CRITICAL RISK' ? 'bg-[#1a0f14] border-danger shadow-danger/20' :
-                      result.level === 'HIGH RISK' ? 'bg-[#1a0f14] border-rose-500/40 shadow-danger/10' :
-                      result.level === 'MEDIUM RISK' ? 'bg-warning/5 border-warning/50' :
-                      'bg-success/5 border-success/50'
-                    }`}>
-                      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-[40px] pointer-events-none ${
-                        result.level.includes('CRITICAL') || result.level.includes('HIGH') ? 'bg-rose-500/10' :
-                        result.level.includes('MEDIUM') ? 'bg-amber-500/100/10' : 'bg-emerald-500/100/10'
+                  {/* Risk Score Header */}
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="soc-card flex-1 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                      <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-[40px] ${
+                        result.level.includes('CRITICAL') || result.level.includes('HIGH') ? 'bg-rose-500/20' :
+                        result.level.includes('MEDIUM') ? 'bg-amber-500/20' : 'bg-emerald-500/20'
                       }`}></div>
                       
-                      <h3 className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-3">RISK ASSESSMENT</h3>
+                      <h3 className="text-slate-400 font-bold text-xs uppercase tracking-wider mb-3 z-10">RISK ASSESSMENT</h3>
                       
-                      <div className={`inline-flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full font-bold text-sm mb-4 border ${
-                        result.level === 'CRITICAL RISK' ? 'bg-danger/30 border-danger text-white pulse-warning' :
-                        result.level === 'HIGH RISK' ? 'bg-rose-500/20 border-rose-500/40 text-rose-400' :
-                        result.level === 'MEDIUM RISK' ? 'bg-warning/20 border-warning/50 text-amber-400' :
-                        'bg-emerald-500/100/20 border-success/50 text-emerald-400'
+                      <div className={`z-10 inline-flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full font-bold text-sm mb-4 border ${
+                        result.level === 'CRITICAL RISK' ? 'bg-rose-500/20 border-rose-500 text-rose-400' :
+                        result.level === 'HIGH RISK' ? 'bg-rose-500/10 border-rose-500/50 text-rose-400' :
+                        result.level === 'MEDIUM RISK' ? 'bg-amber-500/10 border-amber-500/50 text-amber-400' :
+                        'bg-emerald-500/10 border-emerald-500/50 text-emerald-400'
                       }`}>
                         {result.level.includes('LOW') ? <ShieldCheck className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
                         <span>{result.level}</span>
                       </div>
                       
-                      <div className="flex items-baseline justify-center">
+                      <div className="z-10 flex items-baseline justify-center">
                         <span className={`text-7xl font-black tracking-tighter ${
                           result.level.includes('CRITICAL') || result.level.includes('HIGH') ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]' :
                           result.level.includes('MEDIUM') ? 'text-amber-400' : 'text-emerald-400'
                         }`}>
                           {result.score}
                         </span>
-                        <span className="text-2xl text-slate-400 font-bold ml-1">/100</span>
+                        <span className="text-2xl text-slate-500 font-bold ml-1">/100</span>
                       </div>
-                      
-                      <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-wider max-w-xs mx-auto">
-                        This is a risk assessment based on available evidence, not a definitive guarantee.
-                      </p>
                     </div>
 
                     {!result.threatIntelAvailable && (
-                       <div className="bg-gray-800/50 border border-slate-600/50 text-slate-500 px-4 py-2 rounded text-xs text-center">
-                         External threat intelligence is currently unavailable. Local analysis applied.
+                       <div className="bg-slate-900 border border-slate-700/50 text-slate-400 px-4 py-3 rounded-lg text-xs text-center flex items-center justify-center">
+                         External threat intelligence is currently unavailable. Local heuristic analysis applied.
                        </div>
                     )}
                   </div>
                   
                   {/* Indicators List */}
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-700/50 pb-2">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider">Detected Indicators ({result.indicators.length})</h3>
                     </div>
                     
                     {result.indicators.length === 0 ? (
-                      <div className="bg-emerald-500/100/10 border border-emerald-500/30 rounded-lg p-6 text-center space-y-2">
+                      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6 text-center space-y-2">
                         <ShieldCheck className="w-8 h-8 text-emerald-400 mx-auto" />
                         <h4 className="text-emerald-400 font-bold">No Major Threats Detected</h4>
-                        <p className="text-sm text-slate-500">However, always remain cautious and verify senders independently.</p>
+                        <p className="text-sm text-slate-400">However, always remain cautious and verify senders independently.</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {result.indicators.map((ind: any, i: number) => (
-                          <div key={i} className="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 hover:border-gray-600 transition-colors">
+                          <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 hover:border-slate-500/50 transition-colors">
                             <div className="flex items-start space-x-3">
                               <div className="mt-0.5 shrink-0">
                                 {(ind.type === 'urgency' || ind.type === 'impersonation') && <AlertTriangle className="w-4 h-4 text-amber-400" />}
@@ -354,23 +376,23 @@ const PhishingDetector = () => {
                               </div>
                               <div className="space-y-3 text-sm w-full">
                                 <div className="flex justify-between items-center">
-                                  <h4 className="font-bold text-slate-300">{ind.label}</h4>
-                                  <span className="text-xs font-mono text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700/50">+{ind.score} pts</span>
+                                  <h4 className="font-bold text-slate-200">{ind.label}</h4>
+                                  <span className="text-xs font-mono text-cyan-400 bg-cyan-900/30 px-2 py-0.5 rounded border border-cyan-500/30">+{ind.score} pts</span>
                                 </div>
                                 
-                                <div className="bg-slate-900/80 rounded p-2.5 border border-slate-700/50/50">
-                                  <span className="font-bold text-slate-500 text-xs uppercase block mb-1">Evidence:</span> 
-                                  <p className="text-slate-400 font-mono text-xs break-all">{ind.evidence}</p>
+                                <div className="bg-slate-950 rounded border border-slate-800 p-3">
+                                  <span className="font-bold text-slate-500 text-[10px] uppercase block mb-1">Evidence:</span> 
+                                  <p className="text-slate-300 font-mono text-xs break-all">{ind.evidence}</p>
                                 </div>
                                 
-                                <div className="bg-slate-900/80 rounded p-2.5 border border-slate-700/50/50">
-                                  <span className="font-bold text-slate-500 text-xs uppercase block mb-1">Why it matters:</span> 
-                                  <p className="text-slate-400">{ind.explanation}</p>
+                                <div className="bg-slate-900/80 rounded p-3">
+                                  <span className="font-bold text-slate-500 text-[10px] uppercase block mb-1">Why it matters:</span> 
+                                  <p className="text-slate-300">{ind.explanation}</p>
                                 </div>
                                 
-                                <div className="bg-primary/5 rounded p-2.5 border border-primary/10">
-                                  <span className="font-bold text-cyan-400/80 text-xs uppercase block mb-1">Security Recommendation:</span> 
-                                  <p className="text-cyan-400/90">{ind.action}</p>
+                                <div className="bg-cyan-900/10 rounded p-3 border border-cyan-500/20">
+                                  <span className="font-bold text-cyan-500 text-[10px] uppercase block mb-1">Security Recommendation:</span> 
+                                  <p className="text-cyan-100">{ind.action}</p>
                                 </div>
                               </div>
                             </div>
@@ -380,17 +402,8 @@ const PhishingDetector = () => {
                     )}
                   </div>
 
-                  {result.indicators.length > 0 && (
-                     <div className="bg-slate-900/50 rounded-lg p-5 border border-slate-700/50 mt-4">
-                       <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Overall Recommendation</h4>
-                       <p className="text-sm text-slate-400 leading-relaxed">
-                         Based on the detection of {result.indicators.length} risk indicators, it is highly recommended to <strong className="text-white">NOT click any links or provide credentials</strong>. Verify the sender using an independent trusted channel. Do not reply to the email.
-                       </p>
-                     </div>
-                  )}
-
-                  <div className="pt-4 border-t border-slate-700/50 flex justify-center flex-col items-center space-y-2">
-                    <button onClick={handleDownload} className="text-xs flex items-center space-x-2 text-cyan-400 hover:text-white bg-cyan-500/100/10 px-4 py-2 rounded transition-colors border border-cyan-500/40">
+                  <div className="pt-6 border-t border-slate-800 flex justify-center flex-col items-center space-y-2">
+                    <button onClick={handleDownload} className="text-xs flex items-center space-x-2 text-cyan-400 hover:text-white bg-cyan-950 px-6 py-3 rounded-full transition-colors border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
                       <Download className="w-4 h-4" />
                       <span className="font-bold tracking-wider uppercase">DOWNLOAD REPORT</span>
                     </button>
@@ -409,6 +422,3 @@ const PhishingDetector = () => {
 };
 
 export default PhishingDetector;
-
-
-
